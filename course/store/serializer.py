@@ -2,12 +2,10 @@ from rest_framework import serializers
 from .models import *
 
 
-
-class  Online_Examination_SystemSerializer(serializers.ModelSerializer):
+class Online_Examination_SystemSerializer(serializers.ModelSerializer):
     class Meta:
-        model=Online_Examination_System
-        fields='__all__'
-
+        model = Online_Examination_System
+        fields = '__all__'
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -85,4 +83,60 @@ class CartSerializer(serializers.ModelSerializer):
 class CarCourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarCourse
+        fields = '__all__'
+
+
+class TeachersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Teachers
+        fields = '__all__'
+
+
+
+
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = '__all__'
+
+
+class Teachers_ScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Teachers_Schedule
+        fields = '__all__'
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = '__all__'
+
+
+class CoursePricingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoursePricing
+        fields = '__all__'
+
+
+class StudyGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudyGroup
+        fields = '__all__'
+
+
+class AttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attendance
+        fields = '__all__'
+
+
+class HomeworkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Homework
+        fields = '__all__'
+
+
+class ExamResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExamResult
         fields = '__all__'

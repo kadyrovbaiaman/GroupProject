@@ -71,3 +71,48 @@ class CartViewSet(viewsets.ModelViewSet):
 class CarCourseViewSet(viewsets.ModelViewSet):
     queryset = CarCourse.objects.all()
     serializer_class = CarCourseSerializer
+
+
+class TeachersViewSet(viewsets.ModelViewSet):
+    queryset = Teachers.objects.all()
+    serializer_class = TeachersSerializer
+
+
+class StudentViewSet(viewsets.ModelViewSet):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+
+
+class Teachers_ScheduleViewSet(viewsets.ModelViewSet):
+    queryset = Teachers_Schedule.objects.all()
+    serializer_class = Teachers_ScheduleSerializer
+
+
+class SubscriptionViewSet(viewsets.ModelViewSet):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+
+
+class CoursePricingViewSet(viewsets.ModelViewSet):
+    queryset = CoursePricing.objects.all()
+    serializer_class = CoursePricingSerializer
+
+
+class StudyGroupViewSet(viewsets.ModelViewSet):
+    queryset = StudyGroup.objects.all()
+    serializer_class = StudyGroupSerializer
+
+
+class AttendanceViewSet(viewsets.ModelViewSet):
+    queryset = Attendance.objects.all()
+    serializer_class = AttendanceSerializer
+
+
+class HomeworkViewSet(viewsets.ModelViewSet):
+    queryset = Homework.objects.all()
+    serializer_class = HomeworkSerializer
+
+
+class ExamResultViewSet(viewsets.ModelViewSet):
+    queryset = ExamResult.objects.all()
+    serializer_class = ExamResultSerializer
