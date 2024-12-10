@@ -8,6 +8,8 @@ router.register(r'online',Online_Examination_SystemViewSet,basename='online_list
 
 router.register(r'user',UserProfileViewSet,basename='user_list')
 
+router.register(r'student',StudentViewSet,basename='student_list')
+
 router.register(r'questions',QuestionsViewSet,basename='questions_list')
 
 router.register(r'courses',CoursesViewSet,basename='courses_list')
@@ -20,9 +22,7 @@ router.register(r'course_video',CourseVideoViewSet,basename='course_video_list')
 
 router.register(r'lesson_video',LessonVideoViewSet,basename='lesson_video_list')
 
-router.register(r'assignment',AssignmentViewSet,basename='assignment_list')
-
-router.register(r'',ExamViewSet,basename='exam_list')
+router.register(r'exam',ExamViewSet,basename='exam_list')
 
 router.register(r'certificate',CertificateViewSet,basename='certificate_list')
 
@@ -33,8 +33,6 @@ router.register(r'cart',CartViewSet,basename='cart_list')
 router.register(r'carcourse',CarCourseViewSet,basename='carcourse_list')
 
 router.register(r'teacher',TeachersViewSet,basename='teacher_list')
-
-router.register(r'student',StudentViewSet,basename='student_list')
 
 router.register(r'teacher_schedule',Teachers_ScheduleViewSet,basename='teacher_schedule_list')
 

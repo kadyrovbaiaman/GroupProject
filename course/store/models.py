@@ -1,4 +1,3 @@
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
@@ -21,21 +20,18 @@ class Student(UserProfile):
     Phone_number = PhoneNumberField(region='KG', null=True, blank=True)
     Profile_picture = models.ImageField(upload_to='user_images/')
     Bio = models.TextField()
-    Test_date = models.DateField(auto_now_add=True)
+    Test_date = models.DateTimeField(auto_now_add=True)
     Student_No = models.CharField(max_length=255, unique=True)
     Gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')],
                               null=True, blank=True)
     Date_of_Birth = models.DateField(null=True, blank=True)
     Nationality = models.CharField(max_length=50, null=True, blank=True)
 
-    # Национальность
-
     def __str__(self):
         return f'{self.first_name},{self.last_name}'
 
 
 class Teachers(UserProfile):
-    users = models.ManyToManyField(UserProfile, related_name='teachers_of_user')
     Phone_number = PhoneNumberField(region='KG', null=True, blank=True)
     Linkedin = models.URLField()
     Languages = models.CharField(max_length=255)
@@ -51,8 +47,8 @@ class Teachers(UserProfile):
 
 
 class Teachers_Schedule(models.Model):
-    teacher_name = models.CharField(max_length=255)
-    teacher = models.ForeignKey(Teachers, on_delete=models.CASCADE, related_name='teacher_schedules',null=True,blank=True)
+    teacher = models.ForeignKey(Teachers, on_delete=models.CASCADE, related_name='teacher_schedules', null=True,
+                                blank=True)
     CHOICES_WORK_DAYS = (
         ('Monday', 'Monday'),
         ('Tuesday', 'Tuesday'),
@@ -65,13 +61,16 @@ class Teachers_Schedule(models.Model):
     quality = MultiSelectField(choices=CHOICES_WORK_DAYS)
 
     def __str__(self):
-        return f'{self.teacher_name},{self.user},{self.quality}'
+        return f'{self.teacher},{self.quality}'
+
+
 class Course(models.Model):
     course_name = models.CharField(max_length=60, unique=True)
     description = models.TextField()
     price = models.PositiveSmallIntegerField()
-    created_by = models.ForeignKey(Teachers, on_delete=models.CASCADE, related_name='courses_created',null=True,blank=True)
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='enrolled_courses',null=True,blank=True)
+    created_by = models.ForeignKey(Teachers, on_delete=models.CASCADE, related_name='courses_created', null=True,
+                                   blank=True)
+    user = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='enrolled_courses', null=True, blank=True)
     regis_date = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
     level = models.CharField(max_length=20, choices=[('beginner', 'Beginner'), ('intermediate', 'Intermediate'),
@@ -83,8 +82,8 @@ class Course(models.Model):
 
 
 class Subscription(models.Model):
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True,blank=True)
-    start_date = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
+    start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     active = models.BooleanField(default=True)
     courses = models.ManyToManyField(Course)
@@ -102,7 +101,7 @@ class Subscription(models.Model):
 
 class CoursePricing(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True,blank=True)
+    user = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     payment_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices=[('paid', 'Paid'), ('unpaid', 'Unpaid')], default='unpaid')
@@ -121,7 +120,7 @@ class CourseVideo(models.Model):
 class StudyGroup(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    members = models.ManyToManyField(UserProfile, related_name='study_groups_enrolled')
+    members = models.ManyToManyField(Student, related_name='study_groups_enrolled')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='study_groups')
     teachers = models.ManyToManyField(Teachers, related_name='study_groups_taught')
     study_at = models.DateTimeField(auto_now_add=True)
@@ -130,18 +129,25 @@ class StudyGroup(models.Model):
         return f'{self.name}, {self.course}'
 
 
+class Courses(models.Model):
+    curses_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f'{self.curses_name}'
+
+
 class Lesson(models.Model):
     lesson_name = models.CharField(max_length=35)
     content = models.TextField()
-    course = models.ManyToManyField(Course, related_name='lessons')
-    lesson_date = models.DateTimeField(auto_now_add=True)
+    course = models.ManyToManyField(Courses, related_name='lessons')
+    lesson_date = models.DateTimeField()
 
     def __str__(self):
         return f'{self.lesson_name},{self.course}'
 
 
 class Attendance(models.Model):
-    student = models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True,blank=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="attendances")
     attended_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=[('present', 'Present'), ('absent', 'Absent')])
@@ -160,10 +166,10 @@ class Attendance(models.Model):
 class Homework(models.Model):
     topic_name = models.CharField(max_length=255)
     due_date = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='homeworks',null=True,blank=True)
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='homeworks')
+    user = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='homeworks', null=True, blank=True)
     is_completed = models.BooleanField(default=False)
     teacher = models.ForeignKey(Teachers, on_delete=models.CASCADE)
+    description = models.TextField()  #second line
 
     # Monday=models.CharField(max_length=255)
     # Tuesday=models.CharField(max_length=255)
@@ -179,46 +185,20 @@ class LessonVideo(models.Model):
     lesson_data = models.DateTimeField(auto_now_add=True)
 
 
-class Assignment(models.Model):
-    assignment_name = models.CharField(max_length=40)
-    description = models.TextField()
-    due_data = models.DateField(verbose_name='срок сдачи')
-    mark_rules = models.CharField(max_length=255)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    students = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f'{self.assignment_name} , {self.course} , {self.students}'
-
-
-class Courses(models.Model):
-    curses_name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f'{self.curses_name}'
-
-
 class Exam(models.Model):
     exam_name = models.CharField(max_length=40)
     course = models.ForeignKey(Courses, on_delete=models.CASCADE, related_name='exams')
-    teacher = models.ForeignKey(Teachers, on_delete=models.CASCADE,null=True,blank=True)
+    teacher = models.ForeignKey(Teachers, on_delete=models.CASCADE, null=True, blank=True)
     exam_date = models.DateTimeField(auto_now_add=True)
     passing_score = models.PositiveSmallIntegerField(verbose_name='проходной балл')
     duration = models.DurationField(verbose_name='Время на выполнение')
-
-    DIFFICULTY_LEVEL = (
-        ('сложный', 'сложный'),
-        ('средний', 'средний'),
-        ('легкий', 'легкий'),
-    )
-    level_status = models.CharField(max_length=32, choices=DIFFICULTY_LEVEL, default='средний')
 
     def __str__(self):
         return f'{self.exam_name} , {self.course}'
 
 
 class ExamResult(models.Model):
-    student = models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True,blank=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
     score = models.PositiveSmallIntegerField()
     passed = models.BooleanField(default=False)
@@ -230,7 +210,7 @@ class ExamResult(models.Model):
 
 class Questions(models.Model):
     topic_name = models.CharField(max_length=100)
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='questions',null=True,blank=True)
+    user = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='questions', null=True, blank=True)
     course = models.ForeignKey(Courses, on_delete=models.CASCADE, related_name='questions')
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name="questions")
     text = models.TextField()
@@ -246,8 +226,8 @@ class Questions(models.Model):
 
 
 class Certificate(models.Model):
-    student = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
-    course = models.OneToOneField(Course, on_delete=models.CASCADE)
+    student = models.OneToOneField(Student, on_delete=models.CASCADE)
+    course = models.OneToOneField(Courses, on_delete=models.CASCADE)
     issued_at = models.DateField(auto_now_add=True)
     certificate_url = models.FileField(verbose_name='сертификат', null=True, blank=True)
     expiry_date = models.DateField(null=True, blank=True)
@@ -257,8 +237,9 @@ class Certificate(models.Model):
 
 
 class CourseReview(models.Model):
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='course_reviews',null=True,blank=True)
-    teacher = models.ForeignKey(Teachers, on_delete=models.CASCADE, related_name='course_reviews_by_user',null=True,blank=True)
+    user = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='course_reviews', null=True, blank=True)
+    teacher = models.ForeignKey(Teachers, on_delete=models.CASCADE, related_name='course_reviews_by_user', null=True,
+                                blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_reviews')
     rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], null=True, blank=True)
     comment = models.TextField(null=True, blank=True)
@@ -268,13 +249,13 @@ class CourseReview(models.Model):
 
 
 class Favorite(models.Model):
-    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name='favorite_user')
+    user = models.OneToOneField(Student, on_delete=models.CASCADE, related_name='favorite_user')
     favorite_course = models.ForeignKey(Course, on_delete=models.CASCADE)
     register_date = models.DateTimeField(auto_now_add=True)
 
 
 class Cart(models.Model):
-    user = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name='cart')
+    user = models.OneToOneField(Student, on_delete=models.CASCADE, related_name='cart')
 
     def __str__(self):
         return f' {self.user}'
@@ -283,7 +264,7 @@ class Cart(models.Model):
 class CarCourse(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    # quantity = models.PositiveSmallIntegerField(default=1)
+    quantity = models.PositiveSmallIntegerField(default=1)
 
 # covered_skills=models.TextField()
 #    # Камтылган көндүмдөр,Охватываемые навыки::

@@ -13,6 +13,12 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     serializer_class = UserProfileSerializer
 
 
+
+class StudentViewSet(viewsets.ModelViewSet):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+
+
 class QuestionsViewSet(viewsets.ModelViewSet):
     queryset = Questions.objects.all()
     serializer_class = QuestionsSerializer
@@ -41,11 +47,6 @@ class LessonVideoViewSet(viewsets.ModelViewSet):
 class CourseVideoViewSet(viewsets.ModelViewSet):
     queryset = CourseVideo.objects.all()
     serializer_class = CourseVideoSerializer
-
-
-class AssignmentViewSet(viewsets.ModelViewSet):
-    queryset = Assignment.objects.all()
-    serializer_class = AssignmentSerializer
 
 
 class ExamViewSet(viewsets.ModelViewSet):
@@ -77,10 +78,6 @@ class TeachersViewSet(viewsets.ModelViewSet):
     queryset = Teachers.objects.all()
     serializer_class = TeachersSerializer
 
-
-class StudentViewSet(viewsets.ModelViewSet):
-    queryset = Student.objects.all()
-    serializer_class = StudentSerializer
 
 
 class Teachers_ScheduleViewSet(viewsets.ModelViewSet):
