@@ -70,7 +70,7 @@ class Course(models.Model):
     price = models.PositiveSmallIntegerField()
     created_by = models.ForeignKey(Teachers, on_delete=models.CASCADE, related_name='courses_created', null=True,
                                    blank=True)
-    user = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='enrolled_courses', null=True, blank=True)
+    user = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='enrolled_courses', null=True, blank=True)#ckeck
     regis_date = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
     level = models.CharField(max_length=20, choices=[('beginner', 'Beginner'), ('intermediate', 'Intermediate'),
@@ -79,6 +79,12 @@ class Course(models.Model):
 
     def __str__(self):
         return f'{self.course_name},{self.level},{self.status}'
+
+    def get_average_rating(self):
+        ratings = self.course_reviews.all()
+        if ratings.exists():
+            return round(sum(i.stars for i in ratings) / ratings.count(), 1)
+        return 0
 
 
 class Subscription(models.Model):
@@ -238,14 +244,13 @@ class Certificate(models.Model):
 
 class CourseReview(models.Model):
     user = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='course_reviews', null=True, blank=True)
-    teacher = models.ForeignKey(Teachers, on_delete=models.CASCADE, related_name='course_reviews_by_user', null=True,
-                                blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_reviews')
-    rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], null=True, blank=True)
+    stars = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)], null=True, blank=True)
     comment = models.TextField(null=True, blank=True)
+    parent_review = models.ForeignKey('self', related_name='replies', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.user} , {self.course} , {self.rating}'
+        return f'{self.user} , {self.course} , {self.stars}'
 
 
 class Favorite(models.Model):
@@ -259,12 +264,17 @@ class Cart(models.Model):
 
     def __str__(self):
         return f' {self.user}'
-
+    def total_price(self):
+        total = sum(item.course.price * item.quantity for item in self.items.all())
+        return total
 
 class CarCourse(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField(default=1)
+
+    def get_total_price(self):
+        return self.course.price * self.quantity
 
 # covered_skills=models.TextField()
 #    # Камтылган көндүмдөр,Охватываемые навыки::

@@ -48,6 +48,9 @@ router.register(r'attendance',AttendanceViewSet,basename='attendance_list')
 
 router.register(r'homework',HomeworkViewSet,basename='homework_list')
 
+router.register(r'course_review',HomeworkViewSet,basename='course_review_list')
+
+
 
 urlpatterns=[
     path('',include(router.urls)),

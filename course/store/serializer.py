@@ -81,11 +81,15 @@ class CourseSerializer(serializers.ModelSerializer):
     user = StudentProSerializer()
     regis_date = serializers.DateTimeField(format='%d-%m-%Y  %H:%M')
     updated_at = serializers.DateField(format='%d-%m-%Y')
-
+    average_rating=serializers.SerializerMethodField()
     class Meta:
         model = Course
         fields = ['course_name', 'description', 'price', 'created_by',
-                  'user', 'regis_date', 'updated_at', 'level', 'status']
+                  'user', 'regis_date', 'updated_at', 'level', 'status','average_rating']
+
+
+    def get_average_rating(self, obj):
+        return obj.get_average_rating()
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -162,6 +166,9 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ['user']
+
+    def get_total_price(self, obj):
+        return obj.get_total_price()
 
 
 class CarCourseSerializer(serializers.ModelSerializer):
@@ -256,3 +263,9 @@ class ExamResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExamResult
         fields = ['student', 'exam', 'score', 'passed', 'graded_at']
+
+
+class CourseReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseReview
+        fields='__all__'
